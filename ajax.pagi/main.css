@@ -1,0 +1,29 @@
+.content {
+    width: 1000px;
+    margin: 0 auto;
+}
+.block {
+    width: 600px;
+    border: 2px solid grey;
+    margin: 0 auto;
+    margin-top: 20px;
+}
+
+h4 {
+    text-align: center;
+}
+
+.clid{
+    text-align: right;
+}
+
+button {
+margin-left: 450px;
+}
+
+
+/** var x = document.getElementById("onclick");
+    x.onclick = function() {
+    var a = 7;
+    console.error(a);
+}
