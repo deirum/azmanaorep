@@ -1,5 +1,4 @@
 <?php
-ob_start();
 $newsArray = array(
     0 => '1Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has
         been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type
@@ -37,7 +36,7 @@ $newsArray = array(
     11 => '12Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has
         been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type
         scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic.');
-
+ob_start();
 
 ?>
 
@@ -48,17 +47,26 @@ $newsArray = array(
     <meta content="text/html; charset=windows-1252" http-equiv="Content-Type" />
     <title>Test Ajax</title>
 </head>
-
 <body>
-
 
 <div class="content" id="content">
     <?php
-    $header = ob_get_contents();
-    ob_clean();
+    if(!(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+        strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')) {
+        ob_flush();
+        ob_clean();
+    }
+    else {
+        ob_end_clean();
+    }
+
     $itemsCount = 3;
-    if (isset ($_GET["lastIndex"])) {
-        $itemsCount = $_GET["lastIndex"] + 3 < count($newsArray) ? $_GET["lastIndex"] + 3 : count($newsArray);
+if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+    strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+
+        if (isset ($_GET["lastIndex"])) {
+            $itemsCount = $_GET["lastIndex"] + 3 < count($newsArray) ? $_GET["lastIndex"] + 3 : count($newsArray);
+        }
     }
     for ($i = $itemsCount - ($itemsCount - $_GET["lastIndex"]); $i < $itemsCount; $i++) {
         ?>
@@ -67,8 +75,17 @@ $newsArray = array(
             <p><?php echo $newsArray[$i]?></p>
         </div>
     <?php }
-    $content = ob_get_contents();
-    ob_clean();?>
+        if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+            strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+            ob_flush();
+            ob_clean();
+            exit;
+        }
+        else {
+            ob_flush();
+            ob_clean();
+        }
+    ?>
 </div>
 
 <button id="ajaxButton" type="button">Еще новости</button>
@@ -79,7 +96,8 @@ $newsArray = array(
 
         httpRequest = new XMLHttpRequest();
         lastElementIndex = document.getElementsByClassName("block").length;
-        httpRequest.open('GET', location.origin + location.pathname + '?lastIndex=' + lastElementIndex, true);
+        httpRequest.open('GET', location.href + '?lastIndex=' + lastElementIndex, true);
+        httpRequest.setRequestHeader("X-Requested-With", "XMLHttpRequest");
         httpRequest.onreadystatechange = function () {
             if (this.readyState == 4) {
                 if (this.status == 200) {
@@ -90,20 +108,12 @@ $newsArray = array(
                     element.innerHTML += this.responseText;
                 }
             }
-        }
+        };
         httpRequest.send();
     });
 </script>
 </body>
 </html>
 <?php
-$footer = ob_get_contents();
-ob_clean();
-if (!isset($_GET["lastIndex"])) {
-    echo $header;
-    echo $content;
-    echo $footer;
-}   else
-    echo $content;
-ob_end_flush();
+
 ?>
