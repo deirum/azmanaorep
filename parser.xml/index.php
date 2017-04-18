@@ -13,13 +13,15 @@ $itemComments = $rss->channel->item->comments;
 $itemPubDate = $rss->channel->item->pubDate;
 $itemCategory = $rss->channel->item->Category;
 $itemDescription = $rss->channel->item->description;*/
-
-foreach ($rss->channel->item as $item) {
-
-    echo $item->title;
-    echo $item->description;
-    echo "$item->link <br><hr><br>";
-}
+$i = 0;
+    foreach ($rss->channel->item as $item) {
+        if ($i == 10) break;
+        echo $item->title;
+        echo $item->description;
+        echo "$item->pubDate <br>";
+        echo "$item->link <br><hr><br>";
+        $i++;
+    }
 
 $dom = new DOMDocument('1.0');
 $dom->preserveWhiteSpace = false;
