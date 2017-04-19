@@ -3,10 +3,16 @@
 парсинг rss с онлайнера (последних 10 штук)
 */
 
-error_reporting(-1);
-$rss =  simplexml_load_file('https://people.onliner.by/feed');
-$xmlOutput = "<xml version='1.0'>\n<news>";
+/*error_reporting(-1);*/
+function deleteSpecialSymbols($str){
+    $str = str_replace("Читать далее…",'',strip_tags($str));
+    $str = preg_replace("[&nbsp;]"," ",$str);
+    return $str;
+}
 
+function putXMLFromSite() {
+$rss =  simplexml_load_file('https://people.onliner.by/feed');
+$xmlOutput = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<news>\n";
 for ($i = 0; $i < 10; $i++) {
     $item = $rss->channel->item[$i];
     $findNameSpaces = $rss->getNamespaces(true);
@@ -15,22 +21,16 @@ for ($i = 0; $i < 10; $i++) {
     $thumbnail = $findChild->thumbnail[0]->attributes();
 
     $xmlOutput .= "<item>\n";
-    $xmlOutput .= "<title>" . $item->title->__toString() . "</title>\n";
-    $xmlOutput .= "<link>" . $item->link->__toString() . "</link>\n";
-    $xmlOutput .= "<image>" . $thumbnail["url"] . "</image>\n";
-    $xmlOutput .= "<description>" . $item->description->__toString() . "</description>\n";
-    $xmlOutput .= "<date>" . $item->pubDate->__toString() . "</date>\n";
+    $xmlOutput .= "<title>" . deleteSpecialSymbols($item->title) . "</title>\n";
+    $xmlOutput .= "<link>" . deleteSpecialSymbols($item->link) . "</link>\n";
+    $xmlOutput .= "<image>" . deleteSpecialSymbols($thumbnail["url"]) . "</image>\n";
+    $xmlOutput .= "<description>" . deleteSpecialSymbols($item->description) . "</description>\n";
+    $xmlOutput .= "<date>" . deleteSpecialSymbols($item->pubDate) . "</date>\n";
     $xmlOutput .= "</item>\n";
-
-    echo $item->title;
-    echo $item->description;
-    echo $thumbnail["url"];
-
-    echo "$item->link<br>";
-    echo "$item->pubDate<br>";
+}
+$xmlOutput .= "</news>";
+file_put_contents('rss.xml', $xmlOutput, FILE_TEXT);
 }
 
-$xmlOutput .= "</news>\n</xml>";
-
-file_put_contents('rss.xml', $xmlOutput, FILE_TEXT);
+putXMLFromSite();
 ?>
