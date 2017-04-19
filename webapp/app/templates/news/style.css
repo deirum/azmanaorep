@@ -1,0 +1,27 @@
+.content {
+    width: 1000px;
+    margin: 0 auto;
+}
+.block {
+    width: 600px;
+    border: 2px solid grey;
+    margin: 0 auto;
+    margin-top: 20px;
+}
+
+h4 {
+    text-align: center;
+}
+
+h1 {
+    text-align: center;
+    color: greenyellow;
+}
+
+.clid{
+    text-align: right;
+}
+
+#ajaxButton {
+    margin-left: 46.9%;
+}
