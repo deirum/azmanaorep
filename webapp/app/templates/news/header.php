@@ -7,7 +7,5 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="../app/templates/news/style.css">
     <title>MyApplication</title>
-
 </head>
 <body>
-ohhh yeahhh

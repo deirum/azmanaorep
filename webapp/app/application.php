@@ -1,6 +1,6 @@
 <?php
 
-class Application
+final class Application
 {
 
     private static $instance = null;
@@ -14,67 +14,77 @@ class Application
     public static function getInstance()
     {
         if (null === self::$instance) {
-            self::$instance = new self();
+            self::$instance = new static();
         }
         return self::$instance;
+    }
+
+    private function __construct()
+    {
+        $this->property = array("h1" => "news");
     }
 
     private function __clone()
     {
     }
 
-    private function __construct()
+    private function __wakeup()
     {
-        $this->property = array("h1" => "news");
-        ob_start();
+    }
+
+    private function __sleep()
+    {
     }
 
     public function setPageProperty($id, $value)
-    { #устанавливает св-во страницы, например id = 'h1', \#
-        $this->property[$id] = $value;                              #при этом в класс#
+    {
+        $this->property[$id] = $value;
     }
 
     public function getPageProperty($id)
-    {  #получение св-ва страницы по id#
+    {
         $id = (string)$id;
         return $this->property[$id];
     }
 
     public function showProperty($id)
     {
-        /*ob_flush();
-        ob_clean();*/
-        $id = (string)$id;
-        echo $this->getPageProperty($id);     #- на месте вызова оставляет макрос для дальнешей замены#
-        /*ob_flush();*/                      #на необходимое св-во страницы,например если id = 'h1', то макрос =#
-        # #PAGE_PROPERTY_h1#*/
+        echo "#PAGE_PROPERTY_$id#";
+    }
+
+    public function includeFile($filename) {
+        if (file_exists($_SERVER['DOCUMENT_ROOT'] . $filename)) {
+            include_once $_SERVER['DOCUMENT_ROOT'] . $filename;
+        } else {
+            return false;
+        }
+    }
+
+    public function handler($event)
+    {
+        $this->includeFile("/app/init.php");
+        if (call_user_func($event)!= null) {
+            call_user_func($event);
+        }
     }
 
     public function showHeader($template_name)
     {
-        /*ob_clean();*/
-        include "../app/templates/$template_name/header.php";
-        /*ob_flush();*/
+        ob_start();
+        $this->includeFile("/app/templates/$template_name/header.php");
     }
 
     public function showFooter($template_name)
     {
-        /*ob_flush();
-        ob_clean();*/
-        include "../app/templates/$template_name/footer.php";   /*- подключает footer c шаблона*/#
-        /*ob_flush();*/
+        $this->handler("onEpilog");
+        $this->includeFile("/app/templates/$template_name/footer.php");
+        ob_flush();
     }
 
     public function restartBuffer()
     {
-        ob_end_clean();
-        ob_start();
+        ob_clean();
     }
-
-    public function handler($event)
-    {#- проверка и выполнение события с названием $event.#
-        # Регистрация событий должна#
-    }         #происходить с помощью реализации одноименной функции в файле init.php*/#
 
 }
 
