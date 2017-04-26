@@ -12,7 +12,7 @@ function deleteSpecialSymbols($str){
 
 function putXMLFromSite() {
     $rss =  simplexml_load_file('https://people.onliner.by/feed');
-    $xmlOutput = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<news>\n";
+    $xmlOutput = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<news.list>\n";
     for ($i = 0; $i < 10; $i++) {
         $item = $rss->channel->item[$i];
         $findNameSpaces = $rss->getNamespaces(true);
@@ -28,7 +28,7 @@ function putXMLFromSite() {
         $xmlOutput .= "<date>" . deleteSpecialSymbols($item->pubDate) . "</date>\n";
         $xmlOutput .= "</item>\n";
     }
-    $xmlOutput .= "</news>";
+    $xmlOutput .= "</news.list>";
     file_put_contents('rss.xml', $xmlOutput, FILE_TEXT);
 }
 

@@ -6,6 +6,7 @@ final class Application
     private static $instance = null;
     private $property = array();
     private $template = '';
+    private $__components = array();
 
     public static function getInstance()
     {
@@ -49,9 +50,25 @@ final class Application
         return $_SERVER['DOCUMENT_ROOT'] . "/app/templates/" . $this->template;
     }
 
-    public function includeComponent()
+    public function includeComponent($name, $template)
     {
-        #как определить /class.php и что внутри его; classload и тд
+        $component = null;
+        if(empty($this->__components[$name])) {
+            $allClasses = get_declared_classes();
+            include_once($_SERVER['DOCUMENT_ROOT'] . '/app/components/' . $name . '/class.php');
+            $differenceClasses = get_declared_classes();
+            $result = array_diff($differenceClasses, $allClasses);
+
+            foreach ($result as $className) {
+                if (get_parent_class($className) == 'Component') {
+                    $this->__components[$name] = $className;
+                    break;
+                }
+            }
+        }
+        $component = new $this->__components[$name]($name, $template);
+
+        echo '<pre>' . print_r($component, true) . '</pre>';
     }
 
 
@@ -81,8 +98,8 @@ final class Application
         $keys = array_keys($this->property);
         for ($i = 0; $i < count($keys); $i++) {
             $keys[$i] = $this->setMacros($keys[$i]);
-            return $keys;
         }
+        return $keys;
     }
 
     public function includeFile($filename)
@@ -123,7 +140,7 @@ final class Application
 
 }
 
-class Component
+abstract class Component
 {
     private $name = '';
     private $template = '';
@@ -136,11 +153,13 @@ class Component
         $this->params = $params;
     }
 
-    public function includeTemplate()
+    final public function includeTemplate()
     {
         $tempPath = $_SERVER['DOCUMENT_ROOT'] . '/app/components/' . $this->name . '/' . $this->template . '/index.php';
         if (file_exists($tempPath)) {
             include_once($tempPath);
         }
     }
+
+    public abstract function executeComponent();
 }

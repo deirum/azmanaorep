@@ -6,5 +6,5 @@ function onProlog() {
 
 function onEpilog()
 {
-    Application::getInstance('news')->setPageProperty('h1','main content');
+    Application::getInstance()->setPageProperty('h1',"<h1>main content</h1>");
 }
