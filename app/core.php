@@ -50,25 +50,21 @@ final class Application
         return $_SERVER['DOCUMENT_ROOT'] . "/app/templates/" . $this->template;
     }
 
-    public function includeComponent($name, $template)
+    public function includeComponent($name, $tempalte, $params = array())
     {
-        $component = null;
-        if(empty($this->__components[$name])) {
-            $allClasses = get_declared_classes();
+        if (empty($this->__components[$name])) {
+            $firstCount = count(get_declared_classes());
             include_once($_SERVER['DOCUMENT_ROOT'] . '/app/components/' . $name . '/class.php');
-            $differenceClasses = get_declared_classes();
-            $result = array_diff($differenceClasses, $allClasses);
-
-            foreach ($result as $className) {
-                if (get_parent_class($className) == 'Component') {
-                    $this->__components[$name] = $className;
+            $classes = get_declared_classes();
+            for ($i = $firstCount - 1; $i < count($classes); $i++) {
+                if (is_subclass_of($classes[$i], 'Component')) {
+                    $this->__components[$name] = $classes[$i];
                     break;
                 }
             }
         }
-        $component = new $this->__components[$name]($name, $template);
-
-        echo '<pre>' . print_r($component, true) . '</pre>';
+        $component = new $this->__components[$name]($name, $tempalte, $params);
+        $component->executeComponent();
     }
 
 
@@ -144,7 +140,8 @@ abstract class Component
 {
     private $name = '';
     private $template = '';
-    private $params = array();
+    protected $params = array();
+    protected $toResult = array();
 
     public function __construct($name, $template, $params = array())
     {
@@ -155,10 +152,32 @@ abstract class Component
 
     final public function includeTemplate()
     {
-        $tempPath = $_SERVER['DOCUMENT_ROOT'] . '/app/components/' . $this->name . '/' . $this->template . '/index.php';
+        $tempPath = $_SERVER['DOCUMENT_ROOT'] . '/app/components/' . $this->name . '/' . $this->template .
+            '/template.php';
         if (file_exists($tempPath)) {
             include_once($tempPath);
+            showNews($this->arrResult, $this->params);
         }
+    }
+
+    protected function prepareParams()
+    {
+        if (empty($this->params['count']))
+            $this->params['count'] = 3;
+        if (empty($this->params['show_img']))
+            $this->params['show_img'] = 'Y';
+        if (empty($this->params['data']))
+            $this->params['data'] = 'xml.xml';
+    }
+
+    protected function getPageNumber()
+    {
+        $page = 1;
+        if (isset($_GET['PAGE']) &&
+            (int)$_GET['PAGE'] > 0
+        )
+            $page = (int)($_GET['PAGE']);
+        return $page;
     }
 
     public abstract function executeComponent();

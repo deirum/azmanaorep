@@ -39,16 +39,18 @@ function renameImagePath() {
         copy($item->image, 'images/' . $i . '.jpg');
         $item->image = '/images/' . $i . '.jpg';
     }
-    $xml->saveXML("newRSS.xml");
+    $xml->saveXML("xml.xml");
 }
 
 
 function getDescriptionNews(&$i) {
-    $newObj = simplexml_load_file('newRSS.xml');
+    $newObj = simplexml_load_file('xml.xml');
         for (; $i < 10; $i++) {
             $item = $newObj->item[$i];
-            echo $item->description;
+            echo $item->title . '<br>';
+
         }
+    echo '<pre>' . print_r($newObj, true) . '</pre>';
 }
 
 /*putXMLFromSite();
@@ -64,7 +66,7 @@ ob_start();
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html dir="ltr" xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../templates/news/1style.css">
     <meta content="text/html; charset=windows-1252" http-equiv="Content-Type" />
     <title>Test Ajax</title>
 </head>
@@ -110,6 +112,6 @@ ob_start();
 
 <button id="ajaxButton" type="button">Еще новости</button>
 
-<script src="script.js" type="text/javascript"></script>
+<script src="../templates/news/script.js" type="text/javascript"></script>
 </body>
 </html>

@@ -1,1 +1,3 @@
-AddDefaultCharset UTF-8
+RewriteEngine On
+RewriteBase /
+RewriteRule ^news/page\-([0-9]{1,}) /news/index.php?PAGE=$1
