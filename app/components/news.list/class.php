@@ -13,15 +13,29 @@ class NewsList extends Component
         $this->prepareParams();
         $this->arrResult = $this->getResult($this->getPageNumber(), $countElements);
         $this->includeTemplate();
+        $this->getPagination($countElements);
+    }
+
+    private function getPagination($countElements) {
         ?> <div class="pagi"> <?
-        for ($i = 0; $i < $countElements / $this->params['count']; $i++) {
-            if ($this->getPageNumber() != $i+1)
-            { ?><a href="/news/page-<?= $i + 1 ?>/"><?= $i + 1 ?></a>
-            <?php }
-            else {
-                echo  '<a class="active" href="#">' . ($i+1 ). "</a>"; }
-        }
-        ?> </div> <?
+            $plus = $countElements%$this->params['count'] != 0?1:0;
+            $max = (int)($countElements / $this->params['count']) +$plus;
+
+            if ($this->getPageNumber() > (int)($max / 2) && (int)($this->getPageNumber() / 2) != 1) {
+                echo "<a href=\"/news/page-" . ((int)($max / 4)) . "/\" >...</a>";
+            }
+            for ($i = $this->getPageNumber() - 2; $i < $this->getPageNumber() + 1 && $i < $max; $i++) {
+                if ($i >= 0)
+                    if ($this->getPageNumber() != $i + 1) {
+                        ?><a href="/news/page-<?= $i + 1 ?>/" ><?= $i + 1 ?></a> <?php
+                    } else {
+                        ?><a class='active'><?= $i + 1 ?></a> <?php
+                    }
+            }
+            if ($this->getPageNumber() <= (int)($max / 2)) {
+                echo "<a href=\"/news/page-" . (round(($max + $this->getPageNumber()) / 2)) . "/\" >...</a>";
+            }
+            ?> </div> <?
     }
 
     protected function getResult($pageNumber, &$countItems = 0)
@@ -38,6 +52,7 @@ class NewsList extends Component
                 $array[$i]['date'] = $item->date->__toString();
                 $array[$i]['link'] = $item->link->__toString();
                 $array[$i]['image'] = $item->image->__toString();
+                $array[$i]['code'] = $item->code->__toString();
                 $i++;
             }
         }

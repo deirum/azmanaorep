@@ -12,8 +12,9 @@ function showNews($items, $params)
             <?php
             if ($params['show_img'] == 'Y') {
                 ?><a href=" <?= $item['link'] ?>"><img src='/app/data<?= $item['image'] ?>'></a></br>
-                <em><?= $item['date'] ?></em>
                 <?php } ?>
+            <em><?= $item['date'] ?></em>
+            <blockquote><?= $item['code'] ?></blockquote>
         </div>
         <?php
     }
