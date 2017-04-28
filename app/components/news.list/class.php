@@ -12,7 +12,7 @@ class NewsList extends Component
         $countElements = 0;
         $this->prepareParams();
         $this->arrResult = $this->getResult($this->getPageNumber(), $countElements);
-        $this->includeTemplate();
+        $this->includeTemplate("template", $this->arrResult, $this->params); //params
         $this->getPagination($countElements);
     }
 

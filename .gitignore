@@ -1,1 +1,4 @@
 .idea/
+app/data/test.php
+app/data/rss.xml
+app/data/rssCode.xml
